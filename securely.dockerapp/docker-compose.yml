@@ -6,9 +6,9 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
-    # configs:
-    #   - source: elastic_config
-    #     target: /usr/share/elasticsearch/config/elasticsearch.yml
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
       ELASTIC_PASSWORD: changeme
@@ -50,10 +50,10 @@ services:
       mode: replicated
       replicas: 1
 
-# configs:
+configs:
 
-#   elastic_config:
-#     file: ./elasticsearch/config/elasticsearch.yml
+  elastic_config:
+    file: ./config/elasticsearch.yml
 #   logstash_config:
 #     file: ./logstash/config/logstash.yml
 #   logstash_pipeline:
