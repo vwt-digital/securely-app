@@ -41,9 +41,9 @@ services:
     image: docker.elastic.co/kibana/kibana:7.2.0
     ports:
       - "5601:5601"
-    # configs:
-    #   - source: kibana_config
-    #     target: /usr/share/kibana/config/kibana.yml
+    configs:
+      - source: kibana_config
+        target: /usr/share/kibana/config/kibana.yml
     networks:
       - elk
     deploy:
@@ -58,8 +58,8 @@ configs:
 #     file: ./logstash/config/logstash.yml
 #   logstash_pipeline:
 #     file: ./logstash/pipeline/logstash.conf
-#   kibana_config:
-#     file: ./kibana/config/kibana.yml
+  kibana_config:
+    file: ./config/kibana.yml
 
 networks:
   elk:
