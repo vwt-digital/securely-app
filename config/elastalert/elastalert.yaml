@@ -41,4 +41,4 @@ buffer_time:
 # The index on es_host which is used for metadata storage
 # This can be a unmapped index, but it is recommended that you run
 # elastalert-create-index to set a mapping
-writeback_index: elastalert_status
+writeback_index: elastalert
