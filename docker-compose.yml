@@ -1,0 +1,101 @@
+version: '2.3'
+
+x-template: &default-template
+  restart: unless-stopped
+  
+services:
+  proxy:
+    <<: *default-template
+    image: linuxserver/letsencrypt
+    container_name: proxy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - URL=SERVER.securely.ai
+      - EMAIL=admin@securely.ai
+    volumes:
+      - ./config/proxy:/config
+      - ./config/proxy/default:/config/nginx/site-confs/default:ro
+    ports:
+      - 80:80
+      - 443:443
+      - 9200:9200
+      - 9201:9201
+    networks:
+      - elk
+
+  # The vm.max_map_count kernel setting needs to be set to at least 262144 for production use. 
+  # Depending on your platform: 
+  # sysctl -w vm.max_map_count=262144
+  elasticsearch:
+    <<: *default-template
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    container_name: elasticsearch
+    # volumes:
+    #   - /usr/share/elasticsearch/data:/usr/share/elasticsearch/data
+    mem_swappiness: 0
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+      - cluster.name=securely
+      - network.host=0.0.0.0
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    networks:
+      - elk
+
+  logstash:
+    <<: *default-template
+    image: registry.securely.ai/logstash/logstash-config
+    container_name: logstash
+    ports:
+      - "5044:5044"
+      - "8080:8080"
+    volumes:
+      - ~/logstash-backup:/usr/share/logstash/backup
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ES_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+    networks:
+      - elk
+
+  kibana:
+    <<: *default-template
+    image: registry.securely.ai/securely/front-end/securely-dashboard:snapshot-latest
+    container_name: kibana
+    ports:
+      - "127.0.0.1:5601:5601"
+    environment:
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+      - "elastalert-kibana-plugin.serverHost=elastalert"
+    networks:
+      - elk
+
+  elastalert:
+    <<: *default-template
+    image: bitsensor/elastalert:3.0.0-beta.1
+    container_name: elastalert
+    ports:
+      - "127.0.0.1:3030:3030"
+    volumes:
+      - ./config/elastalert/rules:/opt/elastalert/rules
+      - ./config/elastalert/config.json:/opt/elastalert-server/config/config.json
+      - ./config/elastalert/elastalert.yaml:/opt/elastalert/config.yaml
+      - ./config/elastalert/elastalert-test.yaml:/opt/elastalert/config-test.yaml
+    networks:
+      - elk
+
+  # Monitoring
+  watchtower:
+    <<: *default-template
+    container_name: watchtower
+    image: containrrr/watchtower
+    command: "--interval 30 --cleanup"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/config.json:/config.json:ro
+    labels:
+      - com.centurylinklabs.watchtower.enable="false"
+
+networks:
+  elk:

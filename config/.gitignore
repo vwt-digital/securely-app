@@ -1,0 +1,10 @@
+proxy/crontabs/
+proxy/dns-conf/
+proxy/etc/
+proxy/fail2ban/
+proxy/keys/
+proxy/log/
+proxy/nginx/
+proxy/php/
+proxy/www/
+proxy/donoteditthisfile.conf

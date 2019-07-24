@@ -1,0 +1,51 @@
+## Version 2018/12/05 - Changelog: https://github.com/linuxserver/docker-letsencrypt/commits/master/root/defaults/default
+
+# insecure redirect
+server {
+  listen 80;
+  listen [::]:80;
+  server_name _;
+  return 301 https://$host$request_uri;
+}
+server {
+  listen 9200;
+  listen [::]:9200;
+  server_name _;
+  return 301 https://$host:9201$request_uri;
+}
+
+# main server blocks
+server {
+  listen 443 ssl http2 default_server;
+  listen [::]:443 ssl http2 default_server;
+
+  server_name _;
+
+  # all ssl related config moved to ssl.conf
+  include /config/nginx/ssl.conf;
+
+  client_max_body_size      1G;
+
+  location / {
+    include           /config/nginx/proxy.conf;
+    set               $upstream_frontend http://kibana:5601;
+    proxy_pass        $upstream_frontend$request_uri;
+  }
+}
+server {
+  listen 9201 http2;
+  listen [::]:9201 ssl http2;
+
+  server_name _;
+
+  # all ssl related config moved to ssl.conf
+  include /config/nginx/ssl.conf;
+  
+  client_max_body_size      1G;
+
+  location / {
+    include           /config/nginx/proxy.conf;
+    set               $upstream_frontend http://elasticsearch:9200;
+    proxy_pass        $upstream_frontend$request_uri;
+  }
+}

@@ -1,0 +1,3 @@
+# Elastalert config
+
+TODO: @Martijn
