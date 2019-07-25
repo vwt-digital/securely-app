@@ -31,8 +31,8 @@ services:
     <<: *default-template
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
     container_name: elasticsearch
-    # volumes:
-    #   - /usr/share/elasticsearch/data:/usr/share/elasticsearch/data
+    volumes:
+      - /usr/share/elasticsearch/data:/usr/share/elasticsearch/data
     mem_swappiness: 0
     environment:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
