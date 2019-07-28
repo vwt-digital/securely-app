@@ -41,6 +41,7 @@ services:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - script.painless.regex.enabled=true
     networks:
       - elk
 
