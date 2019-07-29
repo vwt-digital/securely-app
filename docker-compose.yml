@@ -35,13 +35,15 @@ services:
       - /usr/share/elasticsearch/data:/usr/share/elasticsearch/data
     mem_swappiness: 0
     environment:
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - bootstrap.memory_lock=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
       - cluster.name=securely
       - network.host=0.0.0.0
       - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
       - script.painless.regex.enabled=true
+      - xpack.security.enabled=true
+      - xpack.monitoring.collection.enabled=true
     networks:
       - elk
 
