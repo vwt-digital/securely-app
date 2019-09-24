@@ -2,7 +2,7 @@ version: '2.3'
 
 x-template: &default-template
   restart: unless-stopped
-  
+
 services:
   proxy:
     <<: *default-template
@@ -57,18 +57,23 @@ services:
     volumes:
       - ~/logstash-backup:/usr/share/logstash/backup
     environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-      ES_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+      - "LS_JAVA_OPTS=-Xmx256m -Xms256m"
+      - ES_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+      - xpack.monitoring.enabled=true
+      - "xpack.monitoring.elasticsearch.hosts=elasticsearch:9200"
+      - xpack.monitoring.elasticsearch.username=${ELASTIC_USERNAME:-elastic}
+      - xpack.monitoring.elasticsearch.password=${ELASTIC_PASSWORD:-changeme}
     networks:
       - elk
 
   kibana:
     <<: *default-template
-    image: registry.securely.ai/securely/front-end/securely-dashboard:snapshot-latest
+    image: registry.securely.ai/securely/front-end/securely-dashboard:develop
     container_name: kibana
     ports:
       - "127.0.0.1:5601:5601"
     environment:
+      - ELASTICSEARCH_USERNAME=${ELASTIC_USERNAME:-elastic}
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme}
       - "elastalert-kibana-plugin.serverHost=elastalert"
     networks:
