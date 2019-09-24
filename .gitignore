@@ -1,2 +1,4 @@
 
-securely\.dockerapp/\.history/
+.idea/
+charts/
+proxy/
