@@ -29,7 +29,7 @@ services:
   # sysctl -w vm.max_map_count=262144
   elasticsearch:
     <<: *default-template
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
     container_name: elasticsearch
     volumes:
       - /usr/share/elasticsearch/data:/usr/share/elasticsearch/data
@@ -53,7 +53,6 @@ services:
     container_name: logstash
     ports:
       - "5044:5044"
-      - "8080:8080"
     volumes:
       - ~/logstash-backup:/usr/share/logstash/backup
     environment:
@@ -72,6 +71,7 @@ services:
     container_name: kibana
     ports:
       - "127.0.0.1:5601:5601"
+      - "50051:50051"
     environment:
       - ELASTICSEARCH_USERNAME=${ELASTIC_USERNAME:-elastic}
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme}
