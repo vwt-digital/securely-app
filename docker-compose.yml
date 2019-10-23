@@ -57,9 +57,13 @@ services:
       - ~/logstash-backup:/usr/share/logstash/backup
     environment:
       - "LS_JAVA_OPTS=-Xmx256m -Xms256m"
+      - ES_HOST=elasticsearch:9200
+      - ES_USERNAME=elastic
       - ES_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+      - GRPC_URL=kibana:50051
+      - KIBANA_HOST=kibana:5601
       - xpack.monitoring.enabled=true
-      - "xpack.monitoring.elasticsearch.hosts=elasticsearch:9200"
+      - xpack.monitoring.elasticsearch.hosts=elasticsearch:9200
       - xpack.monitoring.elasticsearch.username=${ELASTIC_USERNAME:-elastic}
       - xpack.monitoring.elasticsearch.password=${ELASTIC_PASSWORD:-changeme}
     networks:
