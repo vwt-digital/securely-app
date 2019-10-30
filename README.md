@@ -42,7 +42,8 @@ local7.* @@(o)dev.securely.ai:514;RFC3164fmtnl
 ```
 
 ### Filebeat
-```yaml
+This file is typically located in `/etc/filebeat/filebeat.yml`
+```yml
 filebeat.inputs:
   - type: log
     enabled: true
