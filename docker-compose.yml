@@ -32,7 +32,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
     container_name: elasticsearch
     volumes:
-      - /usr/share/elasticsearch/data:/usr/share/elasticsearch/data
+      - esdata:/usr/share/elasticsearch/data
     mem_swappiness: 0
     environment:
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
@@ -54,7 +54,7 @@ services:
     ports:
       - "5044:5044"
     volumes:
-      - ~/logstash-backup:/usr/share/logstash/backup
+      - logstash-backup:/usr/share/logstash/backup
     environment:
       - "LS_JAVA_OPTS=-Xmx256m -Xms256m"
       - ES_HOST=elasticsearch:9200
@@ -111,3 +111,7 @@ services:
 
 networks:
   elk:
+
+volumes:
+  esdata:
+  logstash-backup:
