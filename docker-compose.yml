@@ -81,21 +81,6 @@ services:
     environment:
       - ELASTICSEARCH_USERNAME=${ELASTIC_USERNAME:-elastic}
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme}
-      - "elastalert-kibana-plugin.serverHost=elastalert"
-    networks:
-      - elk
-
-  elastalert:
-    <<: *default-template
-    image: bitsensor/elastalert:3.0.0-beta.1
-    container_name: elastalert
-    ports:
-      - "127.0.0.1:3030:3030"
-    volumes:
-      - ./config/elastalert/rules:/opt/elastalert/rules
-      - ./config/elastalert/config.json:/opt/elastalert-server/config/config.json
-      - ./config/elastalert/elastalert.yaml:/opt/elastalert/config.yaml
-      - ./config/elastalert/elastalert-test.yaml:/opt/elastalert/config-test.yaml
     networks:
       - elk
 
