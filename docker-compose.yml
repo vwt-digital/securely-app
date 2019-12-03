@@ -57,6 +57,7 @@ services:
       - logstash-backup:/usr/share/logstash/backup
     environment:
       - "LS_JAVA_OPTS=-Xmx1g -Xms1g"
+      - NORMALIZE_QUEUE_TYPE=memory
       - ES_HOST=elasticsearch:9200
       - ES_USERNAME=elastic
       - ES_PASSWORD=${ELASTIC_PASSWORD:-changeme}
