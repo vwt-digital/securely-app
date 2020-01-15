@@ -79,6 +79,8 @@ services:
       - "127.0.0.1:5601:5601"
       - "50051:50051"
     environment:
+      - ES_USERNAME=${ELASTIC_USERNAME:-elastic}
+      - ES_PASSWORD=${ELASTIC_PASSWORD:-changeme}
       - ELASTICSEARCH_USERNAME=${ELASTIC_USERNAME:-elastic}
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme}
     networks:
