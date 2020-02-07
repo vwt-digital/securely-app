@@ -80,6 +80,7 @@ services:
     environment:
       - ELASTICSEARCH_USERNAME=${ELASTIC_USERNAME:-elastic}
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD:-changeme}
+      - XPACK_SECURITY_ENCRYPTIONKEY=${KIBANA_ENCRYPTIONKEY:-changemetoo}
     networks:
       - elk
 
