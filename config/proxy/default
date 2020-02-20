@@ -33,7 +33,7 @@ server {
   }
 }
 server {
-  listen 9201 http2;
+  listen 9201 ssl http2;
   listen [::]:9201 ssl http2;
 
   server_name _;
