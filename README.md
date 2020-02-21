@@ -58,5 +58,6 @@ filebeat.inputs:
       negate: true
       match: before
 output.logstash:
-  hosts: ["dev.securely.ai:5044"]
+  hosts: ["dev.securely.ai:5045"]
+  ssl.enabled: true
 ```
