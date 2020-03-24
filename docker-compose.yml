@@ -32,9 +32,10 @@ services:
   # The vm.max_map_count kernel setting needs to be set to at least 262144 for production use. 
   # Depending on your platform: 
   # sysctl -w vm.max_map_count=262144
+  # or persist this setting in /etc/sysctl.conf
   elasticsearch:
     <<: *default-template
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.1
     container_name: elasticsearch
     volumes:
       - esdata:/usr/share/elasticsearch/data
@@ -107,3 +108,9 @@ networks:
 volumes:
   esdata:
   logstash-backup:
+
+# NOTE
+# Make sure to set uid of esdata and logstash-backup volume to 1000
+# Ex. 
+#   docker inspect [VOLUME_NAME] to get mountpoints
+#   chown -R 1000 those mountpoints
