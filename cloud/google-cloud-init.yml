@@ -1,0 +1,82 @@
+#cloud-config
+
+#users:
+#- name: cloudservice
+#  uid: 2000
+
+write_files:
+- path: /etc/systemd/system/securely.service
+  permissions: 0644
+  owner: root
+  content: |
+    [Unit]
+    Description=Securely stack using docker compose
+
+    [Service]
+    ExecStart=/usr/bin/docker run --name securely -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock -v "/etc/securely-app:/etc/securely-app" -w="/etc/securely-app" docker/compose:1.24.0 up elasticsearch logstash kibana watchtower
+    ExecStop=/usr/bin/docker stop securely && docker rm $_
+
+- path: /tmp/nvme-volume-for-elasticsearch.diff
+  permissions: 0644
+  owner: root
+  content: |
+    diff --git a/docker-compose.yml b/docker-compose.yml
+    index cf485e4..00f49db 100644
+    --- a/docker-compose.yml
+    +++ b/docker-compose.yml
+    @@ -107,6 +107,11 @@ networks:
+    
+     volumes:
+       esdata:
+    +    driver: local
+    +    driver_opts:
+    +      o: bind
+    +      type: none
+    +      device: /mnt/disks/nvme/elasticsearch
+       logstash-backup:
+     
+     # NOTE
+- path: /tmp/kibana-port-80.diff
+  permissions: 0644
+  owner: root
+  content: |
+    diff --git a/docker-compose.yml b/docker-compose.yml
+    index 1c7b6ce..9ad38db 100644
+    --- a/docker-compose.yml
+    +++ b/docker-compose.yml
+    @@ -81,7 +81,7 @@ services:
+         image: registry.securely.ai/securely/front-end/securely-dashboard:develop
+         container_name: kibana
+         ports:
+    -      - "127.0.0.1:5601:5601"
+    +      - "80:5601"
+           - "50051:50051"
+         environment:
+           - ELASTICSEARCH_USERNAME=${ELASTIC_USERNAME:-elastic}
+
+runcmd:
+- mkdir /mnt/stateful_partition/root
+- mount --bind /mnt/stateful_partition/root/ /root
+- mkfs.ext4 -F /dev/nvme0n1
+- mkdir /mnt/disks/nvme
+- mount /dev/nvme0n1 /mnt/disks/nvme
+- mkdir /mnt/disks/nvme/elasticsearch
+- cd /etc
+- git clone https://git.securely.ai/securely/common/securely-app.git && cd securely-app
+- git apply /tmp/nvme-volume-for-elasticsearch.diff
+- git apply /tmp/kibana-port-80.diff
+- bash init.sh
+- 'echo "EXTERNAL_HOSTNAME=securely-"`curl -H "Metadata-Flavor: Google" http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip | sed s/\\\\./-/g`".nip.io" >> .env'
+- 'echo "ELASTIC_PASSWORD="`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/securely-elasticsearch-password" -H "Metadata-Flavor: Google"` >> .env'
+- 'curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/securely-registry-password" -H "Metadata-Flavor: Google" | docker login registry.securely.ai -u customer-onprem --password-stdin'
+- systemctl daemon-reload
+- systemctl enable securely.service
+- systemctl start securely.service
+
+# Optional once-per-boot setup. For example: mounting a PD.
+bootcmd:
+#- fsck.ext4 -tvy /dev/[DEVICE_ID]
+#- mkdir -p /mnt/disks/[MNT_DIR]
+#- mount -t ext4 -O ... /dev/[DEVICE_ID] /mnt/disks/[MNT_DIR]
+- '[ -d /mnt/stateful_partition/root/ ] && mount --bind /mnt/stateful_partition/root/ /root || true'
+- 'mkdir /mn/disks/nvme && mount /dev/nvme0n1 /mnt/disks/nvme || true'
