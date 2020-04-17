@@ -16,7 +16,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - URL=SERVER.securely.ai
+      - URL=${EXTERNAL_HOSTNAME:SERVER.securely.ai}
       - EMAIL=admin@securely.ai
     volumes:
       - ./config/proxy:/config
