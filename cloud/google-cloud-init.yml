@@ -79,4 +79,4 @@ bootcmd:
 #- mkdir -p /mnt/disks/[MNT_DIR]
 #- mount -t ext4 -O ... /dev/[DEVICE_ID] /mnt/disks/[MNT_DIR]
 - '[ -d /mnt/stateful_partition/root/ ] && mount --bind /mnt/stateful_partition/root/ /root || true'
-- 'mkdir /mn/disks/nvme && mount /dev/nvme0n1 /mnt/disks/nvme || true'
+- 'mkdir /mnt/disks/nvme && mount /dev/nvme0n1 /mnt/disks/nvme || true'

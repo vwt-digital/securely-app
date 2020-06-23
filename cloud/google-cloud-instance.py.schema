@@ -1,0 +1,38 @@
+info:
+  title: Securely App Compute Instance
+  author: VWT Digital
+  version: 1.0.0
+  description: |
+    Deploys a Securely App Compute Instance connected to a project-specific network.
+
+required:
+  - zone
+  - machine_type
+
+properties:
+  zone:
+    type: string
+    description: Zone to deploy to
+  machine_type:
+    type: string
+    description: Machine type to deploy
+  disk_image:
+    type: string
+    default: None
+    description: |
+      The source image for the disk. To create the disk with one of the
+      public operating system images, specify the image by its family name.
+      For example, use "projects/debian-cloud/global/images/family/debian-9" 
+      to install the latest Debian 9 image.
+      To create a disk with a custom image (that you created), specify the image
+      name in the following format: global/images/my-custom-image.
+      See https://cloud.google.com/compute/docs/images for details.  
+  disk_type:
+    type: string
+    description: |
+      Specifies the disk type to use to create the instance. If not specified, the default is pd-standard.
+      Other values include pd-ssd and local-ssd. 
+  disk_size_gb:
+    type: number
+    description: Specifies the size of the disk in base-2 GB.
+
