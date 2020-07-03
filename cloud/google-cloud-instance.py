@@ -47,12 +47,14 @@ def create_disks(properties, zone, instance_name):
 
 
 def create_network_interfaces(project_id):
+    natIPref = "$(ref.{project_id}-securely-ip.address)".format(project_id=project_id)
     network_interfaces = [
         {
             "network": "$(ref.{project_id}-securely-vn.selfLink)".format(project_id=project_id),
             "accessConfigs": [
                 {
-                    "type": "ONE_TO_ONE_NAT"
+                    "type": "ONE_TO_ONE_NAT",
+                    "natIP": natIPref
                 }
             ]
         }
@@ -82,6 +84,14 @@ def create_metadata(properties, imports):
     return metadata
 
 
+def ZoneToRegion(zone):
+    """Derives the region from a zone name."""
+    parts = zone.split('-')
+    if len(parts) != 3:
+        raise ValueError('Cannot derive region from zone "%s"' % zone)
+    return '-'.join(parts[:2])
+
+
 def generate_config(context):
     """ Entry point for the deployment resources. """
     properties = context.properties
@@ -94,6 +104,15 @@ def generate_config(context):
         "type": "gcp-types/compute-v1:networks",
         "properties": {
             "autoCreateSubnetworks": True
+        }
+    }
+
+    ip_address = {
+        "name": "{project_id}-securely-ip".format(project_id=project_id),
+        "type": "gcp-types/compute-v1:addresses",
+        "properties": {
+            "description": "IP address for Securely App server",
+            "region": ZoneToRegion(zone)
         }
     }
 
@@ -136,11 +155,12 @@ def generate_config(context):
         },
         "metadata": {
             "dependsOn": [
-                "{project_id}-securely-vn".format(project_id=project_id)
+                "{project_id}-securely-vn".format(project_id=project_id),
+                "{project_id}-securely-ip".format(project_id=project_id)
             ]
         }
     }
 
     return {
-        "resources": [network, firewall, securely_vm]
+        "resources": [network, ip_address, firewall, securely_vm]
     }
