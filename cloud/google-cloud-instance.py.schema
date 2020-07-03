@@ -31,8 +31,26 @@ properties:
     type: string
     description: |
       Specifies the disk type to use to create the instance. If not specified, the default is pd-standard.
-      Other values include pd-ssd and local-ssd. 
+      Other values include pd-ssd and local-ssd.
   disk_size_gb:
     type: number
     description: Specifies the size of the disk in base-2 GB.
-
+  additional_open_ports:
+    type: array
+    items:
+      type: number
+    description: Additional ports to open up on firewall
+  additional_disk_type:
+    type: string
+    description: |
+      Specifies the disk type to use to create the instance. If not specified, the default is pd-standard.
+      Other values include pd-ssd and local-ssd.
+  additional_disk_size_gb:
+    type: number
+    description: Specifies the size of the disk in base-2 GB.
+  securely_registry_password:
+    type: string
+    description: Password for Securely container registry access
+  securely_elasticsearch_password:
+    type: string
+    description: Initial password to set on elastic user
