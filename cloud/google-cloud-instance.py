@@ -106,7 +106,7 @@ def generate_config(context):
             "allowed": [
                 {
                     "IPProtocol": "tcp",
-                    "ports": ["22", "80", "5044"]
+                    "ports": ["5044", "50051"].extend(properties.get('additional_open_ports', []))
                 }
             ]
         },
