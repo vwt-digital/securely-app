@@ -97,6 +97,8 @@ def generate_config(context):
         }
     }
 
+    ports_to_open = ["5044", "50051"]
+    ports_to_open.extend(properties.get('additional_open_ports', []))
     firewall = {
         "name": "{project_id}-securely-fw".format(project_id=project_id),
         "type": "gcp-types/compute-v1:firewalls",
@@ -106,7 +108,7 @@ def generate_config(context):
             "allowed": [
                 {
                     "IPProtocol": "tcp",
-                    "ports": ["5044", "50051"].extend(properties.get('additional_open_ports', []))
+                    "ports": ports_to_open
                 }
             ]
         },
