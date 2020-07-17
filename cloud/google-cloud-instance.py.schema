@@ -54,3 +54,6 @@ properties:
   securely_elasticsearch_password:
     type: string
     description: Initial password to set on elastic user
+  service_account_email:
+    type: string
+    description: Email address of the service account this VM should use to interact with GCP APIs

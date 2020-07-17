@@ -81,7 +81,24 @@ def create_metadata(properties, imports):
         ]
     }
 
+    for k, v in imports.items():
+        if k.endswith("-logstash-input"):
+            metadata["items"].append({
+                "key": k,
+                "value": v
+            })
+
     return metadata
+
+
+def create_service_accounts(properties):
+    service_accounts = [
+        {
+            "email": properties["service_account_email"],
+            "scopes": "https://www.googleapis.com/auth/cloud-platform",
+        }
+    ]
+    return service_accounts
 
 
 def ZoneToRegion(zone):
@@ -151,7 +168,8 @@ def generate_config(context):
             "machineType": "zones/{zone}/machineTypes/{machine_type}".format(zone=zone, machine_type=machine_type),
             "disks": create_disks(properties, zone, instance_name),
             "networkInterfaces": create_network_interfaces(project_id),
-            "metadata": create_metadata(properties, context.imports)
+            "metadata": create_metadata(properties, context.imports),
+            "serviceAccounts": create_service_accounts(properties)
         },
         "metadata": {
             "dependsOn": [
