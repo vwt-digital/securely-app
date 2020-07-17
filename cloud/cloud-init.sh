@@ -16,6 +16,6 @@ mkdir -p config/logstash
 for attrib in $(curl "${metadata_attr_url}/" -H "Metadata-Flavor: Google" | grep "\-logstash-input")
 do
     curl "${metadata_attr_url}/${attrib}" -H "Metadata-Flavor: Google" > config/logstash/"${attrib}".conf
-    sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/logstash:\/usr\/share\/logstash\/pipeline\/normalize\/input\/${attrib}.conf/" docker-compose.yml
+    sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/logstash\/${attrib}.conf:\/usr\/share\/logstash\/pipeline\/normalize\/input\/${attrib}.conf/" docker-compose.yml
 done
 
