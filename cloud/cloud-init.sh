@@ -20,7 +20,7 @@ done
 # Configure certificates
 mkdir -p config/securely-certs
 # Mount certificate directory
-sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/securely-certs:\/securely-certs" docker-compose.yml
+sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/securely-certs:\/securely-certs/" docker-compose.yml
 # Add beats input conf configured for ssl server and client authentication
 sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/logstash\/101_beats.conf:\/usr\/share\/logstash\/pipeline\/normalize\/input\/101_beats.conf/" docker-compose.yml
 
