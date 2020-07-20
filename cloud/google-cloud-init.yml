@@ -13,7 +13,7 @@ write_files:
     Description=Securely stack using docker compose
 
     [Service]
-    ExecStart=/usr/bin/docker run --name securely -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock -v "/etc/securely-app:/etc/securely-app" -w="/etc/securely-app" docker/compose:1.24.0 up elasticsearch logstash kibana watchtower
+    ExecStart=/usr/bin/docker run --name securely -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock -v "/etc/securely-app:/etc/securely-app" -w="/etc/securely-app" docker/compose:1.24.0 up elasticsearch logstash kibana watchtower proxy
     ExecStop=/usr/bin/docker stop securely && docker rm $_
 
 - path: /tmp/docker-compose.diff

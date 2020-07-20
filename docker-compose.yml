@@ -11,16 +11,14 @@ x-template: &default-template
 services:
   proxy:
     <<: *default-template
-    image: linuxserver/letsencrypt
+    image: nginx
     container_name: proxy
     environment:
       - PUID=1000
       - PGID=1000
-      - URL=${EXTERNAL_HOSTNAME:-SERVER.securely.ai}
-      - EMAIL=admin@securely.ai
     volumes:
-      - ./config/proxy:/config
-      - ./config/proxy/default:/config/nginx/site-confs/default:ro
+      - ./config/proxy/default:/etc/nginx/conf.d/nginx.conf:ro
+      - /etc/ssl/certs:/etc/ssl/certs
     ports:
       - 80:80
       - 443:443
@@ -29,8 +27,8 @@ services:
     networks:
       - elk
 
-  # The vm.max_map_count kernel setting needs to be set to at least 262144 for production use. 
-  # Depending on your platform: 
+  # The vm.max_map_count kernel setting needs to be set to at least 262144 for production use.
+  # Depending on your platform:
   # sysctl -w vm.max_map_count=262144
   # or persist this setting in /etc/sysctl.conf
   elasticsearch:
@@ -111,6 +109,6 @@ volumes:
 
 # NOTE
 # Make sure to set uid of esdata and logstash-backup volume to 1000
-# Ex. 
+# Ex.
 #   docker inspect [VOLUME_NAME] to get mountpoints
 #   chown -R 1000 those mountpoints
