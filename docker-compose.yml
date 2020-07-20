@@ -18,7 +18,7 @@ services:
       - PGID=1000
     volumes:
       - ./config/proxy/default:/etc/nginx/conf.d/nginx.conf:ro
-      - /etc/ssl/certs:/etc/ssl/certs
+      - ./config/securely-certs:/securely-certs
     ports:
       - 80:80
       - 443:443
