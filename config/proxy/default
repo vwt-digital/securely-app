@@ -24,8 +24,8 @@ server {
 
   server_name _;
 
-  ssl_certificate        /etc/ssl/certs/securely.crt;
-  ssl_certificate_key    /etc/ssl/certs/securely.key.pem;
+  ssl_certificate        /securely-certs/securely.crt;
+  ssl_certificate_key    /securely-certs/securely.key.pem;
 
   client_max_body_size      1G;
 
@@ -45,8 +45,8 @@ server {
 
   server_name _;
 
-  ssl_certificate        /etc/ssl/certs/securely.crt;
-  ssl_certificate_key    /etc/ssl/certs/securely.key.pem;
+  ssl_certificate        /securely-certs/securely.crt;
+  ssl_certificate_key    /securely-certs/securely.key.pem;
 
   client_max_body_size      1G;
 
