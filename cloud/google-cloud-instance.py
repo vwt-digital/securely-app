@@ -112,7 +112,7 @@ def create_service_accounts(properties):
     service_accounts = [
         {
             "email": properties["service_account_email"],
-            "scopes": ["https://www.googleapis.com/auth/cloud-platform"],
+            "scopes": ["https://www.googleapis.com/auth/cloud-platform"]
         }
     ]
     return service_accounts
