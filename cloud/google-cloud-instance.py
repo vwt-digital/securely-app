@@ -81,6 +81,23 @@ def create_metadata(properties, imports):
         ]
     }
 
+    if "securely-cert" in imports and "securely-cert-key" in imports:
+        metadata["items"].append(
+            {
+                "key": "securely-cert",
+                "value": imports["securely-cert"]
+            })
+        metadata["items"].append(
+            {
+                "key": "securely-cert-key",
+                "value": imports["securely-cert-key"]
+            })
+        metadata["items"].append(
+            {
+                "key": "securely-ca",
+                "value": imports["securely-ca"]
+            })
+
     for k, v in imports.items():
         if k.endswith("-logstash-input"):
             metadata["items"].append({

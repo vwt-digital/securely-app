@@ -13,7 +13,7 @@ write_files:
     Description=Securely stack using docker compose
 
     [Service]
-    ExecStart=/usr/bin/docker run --name securely -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock -v "/etc/securely-app:/etc/securely-app" -w="/etc/securely-app" docker/compose:1.24.0 up elasticsearch logstash kibana watchtower
+    ExecStart=/usr/bin/docker run --name securely -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock -v "/etc/securely-app:/etc/securely-app" -w="/etc/securely-app" docker/compose:1.24.0 up elasticsearch logstash kibana watchtower proxy
     ExecStop=/usr/bin/docker stop securely && docker rm $_
 
 - path: /tmp/docker-compose.diff
@@ -21,18 +21,10 @@ write_files:
   owner: root
   content: |
     diff --git a/docker-compose.yml b/docker-compose.yml
-    index 1c7b6ce..c0b617d 100644
+    index 1c7b6ce..50d0784 100644
     --- a/docker-compose.yml
     +++ b/docker-compose.yml
-    @@ -61,6 +61,7 @@ services:
-           - "5044:5044"
-         volumes:
-           - logstash-backup:/usr/share/logstash/backup
-    +      - ./config/logstash:/usr/share/logstash/pipeline/normalize/input
-         environment:
-           - "LS_JAVA_OPTS=-Xmx1g -Xms1g"
-           - NORMALIZE_QUEUE_TYPE=memory
-    @@ -107,6 +108,11 @@ networks:
+    @@ -107,6 +107,11 @@ networks:
 
      volumes:
        esdata:
