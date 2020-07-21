@@ -3,10 +3,14 @@
 metadata_url="http://metadata.google.internal/computeMetadata/v1/instance"
 metadata_attr_url="${metadata_url}/attributes"
 
+ELASTIC_PW="$(curl "${metadata_attr_url}/securely-elasticsearch-password" \
+        -H "Metadata-Flavor: Google")"
+
 if ! grep -q "ELASTIC_PASSWORD" .env
 then
-    echo "ELASTIC_PASSWORD=$(curl "${metadata_attr_url}/securely-elasticsearch-password" \
-        -H "Metadata-Flavor: Google")" >> .env
+    echo "ELASTIC_PASSWORD=${ELASTIC_PW}" >> .env
+else
+    sed -i "s/^ELASTIC_PASSWORD=.*/ELASTIC_PASSWORD=${ELASTIC_PW}/" .env
 fi
 
 # Docker login securely-registry, retrieving password from metadata
