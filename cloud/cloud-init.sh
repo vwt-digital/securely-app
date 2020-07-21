@@ -3,7 +3,15 @@
 metadata_url="http://metadata.google.internal/computeMetadata/v1/instance"
 metadata_attr_url="${metadata_url}/attributes"
 
-echo "ELASTIC_PASSWORD=$(curl "${metadata_attr_url}/securely-elasticsearch-password" -H "Metadata-Flavor: Google")" >> .env
+ELASTIC_PW="$(curl "${metadata_attr_url}/securely-elasticsearch-password" \
+        -H "Metadata-Flavor: Google")"
+
+if ! grep -q "ELASTIC_PASSWORD" .env
+then
+    echo "ELASTIC_PASSWORD=${ELASTIC_PW}" >> .env
+else
+    sed -i "s/^ELASTIC_PASSWORD=.*/ELASTIC_PASSWORD=${ELASTIC_PW}/" .env
+fi
 
 # Docker login securely-registry, retrieving password from metadata
 curl "${metadata_attr_url}/securely-registry-password" -H "Metadata-Flavor: Google" |
@@ -14,15 +22,27 @@ mkdir -p config/logstash
 for attrib in $(curl "${metadata_attr_url}/" -H "Metadata-Flavor: Google" | grep "\-logstash-input")
 do
     curl "${metadata_attr_url}/${attrib}" -H "Metadata-Flavor: Google" > config/logstash/"${attrib}".conf
-    sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/logstash\/${attrib}.conf:\/usr\/share\/logstash\/pipeline\/normalize\/input\/${attrib}.conf/" docker-compose.yml
+
+    if ! grep -q "logstash\/${attrib}.conf" docker-compose.yml
+    then
+        sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/logstash\/${attrib}.conf:\/usr\/share\/logstash\/pipeline\/normalize\/input\/${attrib}.conf/" docker-compose.yml
+    fi
 done
 
 # Configure certificates
 mkdir -p config/securely-certs
+
 # Mount certificate directory
-sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/securely-certs:\/securely-certs/" docker-compose.yml
+if ! grep -q "config\/securely-certs.* added" docker-compose.yml
+then
+    sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/securely-certs:\/securely-certs   # added/" docker-compose.yml
+fi
+
 # Add beats input conf configured for ssl server and client authentication
-sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/logstash\/101_beats.conf:\/usr\/share\/logstash\/pipeline\/normalize\/input\/101_beats.conf/" docker-compose.yml
+if ! grep -q "logstash\/101_beats.conf" docker-compose.yml
+then
+    sed -i "s/- logstash-backup:\/usr\/share\/logstash\/backup/- logstash-backup:\/usr\/share\/logstash\/backup\n      - .\/config\/logstash\/101_beats.conf:\/usr\/share\/logstash\/pipeline\/normalize\/input\/101_beats.conf/" docker-compose.yml
+fi
 
 # Retrieve certificates and keys from meta data
 if curl "${metadata_attr_url}/" -H "Metadata-Flavor: Google" | grep -q "^securely-cert"
