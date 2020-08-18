@@ -55,3 +55,21 @@ server {
     proxy_pass        $upstream_frontend$request_uri;
   }
 }
+
+upstream gbackend {
+  server kibana:50051;
+}
+
+server {
+  listen 50052 ssl http2 default_server;
+  listen [::]:50052 ssl http2 default_server;
+
+  server_name _;
+
+  ssl_certificate        /securely-certs/securely.crt;
+  ssl_certificate_key    /securely-certs/securely.key.pem;
+
+  location / {
+    grpc_pass        gbackend;
+  }
+}
