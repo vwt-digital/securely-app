@@ -40,9 +40,9 @@ write_files:
 runcmd:
 - mkdir /mnt/stateful_partition/root
 - mount --bind /mnt/stateful_partition/root/ /root
-- mkdir /mnt/disks/datadisk
-- [ ! -e /dev/nvme0n1 ] || ( mkfs.ext4 -F /dev/nvme0n1 && mount /dev/nvme0n1 /mnt/disks/datadisk )
-- [ -e /dev/nvme0n1 ] || ( mkfs.ext4 -F /dev/sdb && mount /dev/sdb /mnt/disks/datadisk )
+- mkdir -p /mnt/disks/datadisk
+- '[ ! -e /dev/nvme0n1 ] || ( mkfs.ext4 -F /dev/nvme0n1 && mount /dev/nvme0n1 /mnt/disks/datadisk )'
+- '[ -e /dev/nvme0n1 ] || ( mkfs.ext4 -F /dev/sdb && mount /dev/sdb /mnt/disks/datadisk )'
 - mkdir /mnt/disks/datadisk/elasticsearch
 - cd /etc
 - git clone https://github.com/vwt-digital/securely-app.git securely-app && cd securely-app
