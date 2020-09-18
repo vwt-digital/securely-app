@@ -182,7 +182,7 @@ def generate_config(context):
         "properties": {
             "network": "$(ref.{project_id}-securely-vn.selfLink)".format(project_id=project_id),
             "targetTags": ["securely"],
-            "soureRanges": "35.235.240.0/20",
+            "sourceRanges": "35.235.240.0/20",
             "allowed": [
                 {
                     "IPProtocol": "tcp",
