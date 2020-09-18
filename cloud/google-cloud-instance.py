@@ -30,15 +30,19 @@ def create_disks(properties, zone, instance_name):
     additional_disk_type = properties.get("additional_disk_type")
     if additional_disk_type:
         additional_disk = {
-            "type": "SCRATCH",
             "boot": False,
-            "autoDelete": True,
             "initializeParams": {
                 "diskType": "zones/{}/diskTypes/{}".format(zone, additional_disk_type),
             }
         }
 
+        additional_disk_size_gb = properties.get("additional_disk_size_gb")
+        if additional_disk_size_gb:
+            additional_disk["initializeParams"]["diskSizeGb"] = additional_disk_size_gb
+
         if additional_disk_type == "local-ssd":
+            additional_disk["type"] = "SCRATCH"
+            additional_disk["autoDelete"] = True
             additional_disk["interface"] = "NVME"
 
         disks.append(additional_disk)
@@ -152,7 +156,7 @@ def generate_config(context):
 
     ports_to_open = ["5044", "50052"]
     ports_to_open.extend(properties.get('additional_open_ports', []))
-    firewall = {
+    firewall_securely = {
         "name": "{project_id}-securely-fw".format(project_id=project_id),
         "type": "gcp-types/compute-v1:firewalls",
         "properties": {
@@ -162,6 +166,27 @@ def generate_config(context):
                 {
                     "IPProtocol": "tcp",
                     "ports": ports_to_open
+                }
+            ]
+        },
+        "metadata": {
+            "dependsOn": [
+                "{project_id}-securely-vn".format(project_id=project_id)
+            ]
+        }
+    }
+
+    firewall_iap_tunnel = {
+        "name": "{project_id}-securely-iap-fw".format(project_id=project_id),
+        "type": "gcp-types/compute-v1:firewalls",
+        "properties": {
+            "network": "$(ref.{project_id}-securely-vn.selfLink)".format(project_id=project_id),
+            "targetTags": ["securely"],
+            "soureRanges": "35.235.240.0/20",
+            "allowed": [
+                {
+                    "IPProtocol": "tcp",
+                    "ports": ["22"]
                 }
             ]
         },
@@ -197,5 +222,5 @@ def generate_config(context):
     }
 
     return {
-        "resources": [network, ip_address, firewall, securely_vm]
+        "resources": [network, ip_address, firewall_securely, firewall_iap_tunnel, securely_vm]
     }

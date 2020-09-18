@@ -14,7 +14,7 @@ write_files:
 
     [Service]
     ExecStart=/usr/bin/docker run --name securely -v /root/.docker:/root/.docker -v /var/run/docker.sock:/var/run/docker.sock -v "/etc/securely-app:/etc/securely-app" -w="/etc/securely-app" docker/compose:1.24.0 up elasticsearch logstash kibana watchtower proxy
-    ExecStop=/usr/bin/docker stop securely && docker rm $_
+    ExecStop=/etc/securely-app/cloud/execstop.sh
 
 - path: /tmp/docker-compose.diff
   permissions: 0644
@@ -32,7 +32,7 @@ write_files:
     +    driver_opts:
     +      o: bind
     +      type: none
-    +      device: /mnt/disks/nvme/elasticsearch
+    +      device: /mnt/disks/datadisk/elasticsearch
        logstash-backup:
 
      # NOTE
@@ -40,10 +40,10 @@ write_files:
 runcmd:
 - mkdir /mnt/stateful_partition/root
 - mount --bind /mnt/stateful_partition/root/ /root
-- mkfs.ext4 -F /dev/nvme0n1
-- mkdir /mnt/disks/nvme
-- mount /dev/nvme0n1 /mnt/disks/nvme
-- mkdir /mnt/disks/nvme/elasticsearch
+- mkdir /mnt/disks/datadisk
+- [ ! -e /dev/nvme0n1 ] || ( mkfs.ext4 -F /dev/nvme0n1 && mount /dev/nvme0n1 /mnt/disks/datadisk )
+- [ -e /dev/nvme0n1 ] || ( mkfs.ext4 -F /dev/sdb && mount /dev/sdb /mnt/disks/datadisk )
+- mkdir /mnt/disks/datadisk/elasticsearch
 - cd /etc
 - git clone https://github.com/vwt-digital/securely-app.git securely-app && cd securely-app
 - git apply /tmp/docker-compose.diff
@@ -59,4 +59,5 @@ bootcmd:
 # - mkdir -p /mnt/disks/[MNT_DIR]
 # - mount -t ext4 -O ... /dev/[DEVICE_ID] /mnt/disks/[MNT_DIR]
 - '[ -d /mnt/stateful_partition/root/ ] && mount --bind /mnt/stateful_partition/root/ /root || true'
-- 'mkdir /mnt/disks/nvme && mount /dev/nvme0n1 /mnt/disks/nvme || true'
+- '[ ! -d /mnt/disks/datadisk/elasticsearch ] && mkdir -p /mnt/disks/datadisk && mount /dev/nvme0n1 /mnt/disks/datadisk || true'
+- '[ ! -d /mnt/disks/datadisk/elasticsearch ] && mkdir -p /mnt/disks/datadisk && mount /dev/sdb /mnt/disks/datadisk || true'
